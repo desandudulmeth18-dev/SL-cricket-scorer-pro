@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>SL Cricket Scorer Pro</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:linear-gradient(135deg,#002b1a,#001f33);
+color:#00ffcc;
+overflow:hidden;
+}
+
+/* SCREEN */
+.screen{
+display:none;
+height:100vh;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+opacity:0;
+transform:scale(0.9);
+transition:all 0.6s ease;
+}
+
+.active{
+display:flex;
+opacity:1;
+transform:scale(1);
+}
+
+/* HEADER */
+.header{
+width:100%;
+background:#001f33;
+padding:12px;
+text-align:center;
+box-shadow:0 0 20px #00ffcc;
+animation:glow 2s infinite alternate;
+}
+
+@keyframes glow{
+from{box-shadow:0 0 10px #00ffcc;}
+to{box-shadow:0 0 30px #00ffcc;}
+}
+
+.logo{
+font-size:24px;
+font-weight:bold;
+}
+
+.sub{
+font-size:12px;
+color:#66ffcc;
+}
+
+/* LAYOUT */
+.container{
+width:95%;
+height:100%;
+display:flex;
+flex-direction:column;
+justify-content:space-between;
+}
+
+.top{text-align:center;}
+
+.score{
+font-size:100px;
+font-weight:bold;
+animation:pulse 1.5s infinite;
+}
+
+@keyframes pulse{
+0%{transform:scale(1);}
+50%{transform:scale(1.08);}
+100%{transform:scale(1);}
+}
+
+.match{font-size:22px;}
+#overs{font-size:20px;}
+
+.middle{
+display:flex;
+justify-content:space-between;
+padding:0 10px;
+}
+
+.panel{
+width:32%;
+background:#003366;
+padding:10px;
+border-radius:15px;
+box-shadow:0 0 15px #00ffcc;
+}
+
+.panel h3{
+font-size:18px;
+}
+
+.info{
+font-size:16px;
+margin:5px 0;
+}
+
+.controls{
+text-align:center;
+}
+
+/* BUTTONS (FULL ANIMATION) */
+button{
+margin:8px;
+padding:14px 22px;
+font-size:18px;
+border:none;
+border-radius:12px;
+cursor:pointer;
+transition:all 0.2s ease;
+position:relative;
+overflow:hidden;
+}
+
+/* HOVER */
+button:hover{
+transform:scale(1.1);
+box-shadow:0 0 15px #00ffcc;
+}
+
+/* CLICK */
+button:active{
+transform:scale(0.9);
+}
+
+/* SHINE EFFECT */
+button::after{
+content:'';
+position:absolute;
+top:0;
+left:-100%;
+width:100%;
+height:100%;
+background:linear-gradient(120deg,transparent,rgba(255,255,255,0.4),transparent);
+transition:0.5s;
+}
+
+button:hover::after{
+left:100%;
+}
+
+/* COLORS */
+.run{background:#00cc66;color:black;}
+.boundary{background:#00ffcc;color:black;}
+.dot{background:#444;color:white;}
+.wicket{background:#cc0000;color:white;}
+.control{background:#0099cc;color:white;}
+
+input{
+padding:10px;
+margin:6px;
+border-radius:10px;
+border:none;
+font-size:16px;
+}
+
+/* COIN */
+#coinAnim{
+font-size:90px;
+animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+0%{transform:rotateY(0deg);}
+100%{transform:rotateY(360deg);}
+}
+
+/* SCORE POP */
+.pop{animation:pop 0.3s;}
+
+@keyframes pop{
+0%{transform:scale(1);}
+50%{transform:scale(1.3);}
+100%{transform:scale(1);}
+}
+</style>
+</head>
+
+<body>
+
+<audio id="crowd" src="https://www.soundjay.com/human/crowd-cheer-01.mp3"></audio>
+<audio id="coinSound" src="https://www.soundjay.com/misc/coin-flip-01.mp3"></audio>
+
+<!-- INTRO -->
+<div class="screen active" id="intro">
+<h1>🏏 SL Cricket Scorer Pro</h1>
+<p>Professional Cricket Scoring App</p>
+<p style="font-size:12px;color:#66ffcc;">Developed by Desandu</p>
+</div>
+
+<div class="screen" id="oversScreen">
+<h2>Select Match Type</h2>
+<input id="oversInput" placeholder="Overs">
+<button onclick="setOvers()">Start Match</button>
+<button onclick="setTest()">Test Match</button>
+</div>
+
+<div class="screen" id="teams">
+<h2>Enter Teams</h2>
+<input id="team1">
+<input id="team2">
+<button onclick="goToss()">Next</button>
+</div>
+
+<div class="screen" id="toss">
+<h2>Who won the toss?</h2>
+<div id="tossButtons"></div>
+</div>
+
+<div class="screen" id="coinScreen">
+<h2>Flipping Coin...</h2>
+<div id="coinAnim">🪙</div>
+</div>
+
+<div class="screen" id="decision">
+<h2>Bat or Bowl?</h2>
+<button onclick="choose('bat')">Bat</button>
+<button onclick="choose('bowl')">Bowl</button>
+</div>
+
+<div class="screen" id="batsmen">
+<h2>Opening Batsmen</h2>
+<input id="bat1">
+<input id="bat2">
+<button onclick="startGame()">Start</button>
+</div>
+
+<div class="screen" id="game">
+
+<div class="header">
+<div class="logo">🏏 SL Cricket Scorer Pro</div>
+<div class="sub">Developed by Desandu</div>
+</div>
+
+<div class="container">
+
+<div class="top">
+<div class="match" id="matchTitle"></div>
+<div class="score" id="score">0/0</div>
+<div id="overs"></div>
+</div>
+
+<div class="middle">
+
+<div class="panel">
+<h3>Batsmen</h3>
+<div id="striker" class="info"></div>
+<div id="nonStriker" class="info"></div>
+</div>
+
+<div class="panel">
+<h3>Game Info</h3>
+<div id="innings" class="info"></div>
+<div id="target" class="info"></div>
+</div>
+
+<div class="panel">
+<h3>Bowler</h3>
+<div id="bowler" class="info"></div>
+</div>
+
+</div>
+
+<div class="controls">
+<button class="run" onclick="run(1)">1</button>
+<button class="run" onclick="run(2)">2</button>
+<button class="run" onclick="run(3)">3</button>
+<button class="boundary" onclick="run(4)">4</button>
+<button class="boundary" onclick="run(6)">6</button>
+
+<br>
+
+<button class="dot" onclick="dot()">DOT</button>
+<button class="wicket" onclick="wicket()">WICKET</button>
+
+<br>
+
+<button class="control" onclick="nextInnings()">NEXT INNINGS</button>
+</div>
+
+</div>
+</div>
+
+<div class="screen" id="scorecard">
+<h2 id="result"></h2>
+<button onclick="location.reload()">New Match</button>
+</div>
+
+<script>
+
+let t1,t2,tossWinner,battingTeam,bowlingTeam;
+let innings=1,target=0,maxOvers=null;
+
+let runs=0,wickets=0,balls=0;
+let striker,nonStriker;
+let sRuns=0,sBalls=0,nsRuns=0,nsBalls=0;
+let currentBowler="",overRuns=0;
+
+function show(id){
+document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+}
+
+setTimeout(()=>show('oversScreen'),2000);
+
+function setOvers(){
+maxOvers=parseInt(document.getElementById("oversInput").value);
+show("teams");
+}
+
+function setTest(){
+maxOvers=null;
+show("teams");
+}
+
+function goToss(){
+t1=document.getElementById("team1").value;
+t2=document.getElementById("team2").value;
+
+document.getElementById("tossButtons").innerHTML=
+`<button onclick="toss('${t1}')">${t1}</button>
+<button onclick="toss('${t2}')">${t2}</button>`;
+
+show("toss");
+}
+
+function toss(team){
+tossWinner=team;
+document.getElementById("coinSound").play();
+show("coinScreen");
+
+setTimeout(()=>show("decision"),2000);
+}
+
+function choose(choice){
+battingTeam=(choice==='bat')?tossWinner:(tossWinner===t1?t2:t1);
+bowlingTeam=(battingTeam===t1?t2:t1);
+show("batsmen");
+}
+
+function startGame(){
+striker=document.getElementById("bat1").value;
+nonStriker=document.getElementById("bat2").value;
+
+currentBowler=prompt("Opening Bowler:");
+document.getElementById("bowler").innerText=currentBowler;
+
+document.getElementById("matchTitle").innerText=
+battingTeam+" vs "+bowlingTeam;
+
+update();
+show("game");
+}
+
+function update(){
+let over=Math.floor(balls/6)+"."+(balls%6);
+
+let scoreEl=document.getElementById("score");
+scoreEl.classList.add("pop");
+setTimeout(()=>scoreEl.classList.remove("pop"),300);
+
+scoreEl.innerText=runs+"/"+wickets;
+document.getElementById("overs").innerText="Overs: "+over;
+
+document.getElementById("striker").innerText=
+striker+" "+sRuns+"("+sBalls+")";
+
+document.getElementById("nonStriker").innerText=
+nonStriker+" "+nsRuns+"("+nsBalls+")";
+
+document.getElementById("innings").innerText="Innings: "+innings;
+
+if(innings===2){
+document.getElementById("target").innerText="Target: "+target;
+}
+
+if(maxOvers && balls>=maxOvers*6){
+endInnings();
+}
+}
+
+function run(r){
+runs+=r; balls++; sRuns+=r; sBalls++; overRuns+=r;
+if(r>=4) document.getElementById("crowd").play();
+
+if(r%2===1) swap();
+if(balls%6===0) newOver();
+
+update();
+checkWin();
+}
+
+function dot(){balls++; sBalls++; if(balls%6===0)newOver(); update();}
+
+function wicket(){
+wickets++; balls++; sBalls++;
+
+if(wickets===10){endInnings();return;}
+
+striker=prompt("New batsman:");
+sRuns=0; sBalls=0;
+
+update();
+}
+
+function swap(){
+[striker,nonStriker]=[nonStriker,striker];
+[sRuns,nsRuns]=[nsRuns,sRuns];
+[sBalls,nsBalls]=[nsBalls,sBalls];
+}
+
+function newOver(){
+alert("Over: "+overRuns+" runs");
+overRuns=0;
+
+currentBowler=prompt("New Bowler:");
+document.getElementById("bowler").innerText=currentBowler;
+
+swap();
+}
+
+function endInnings(){
+if(innings===1){
+target=runs+1;
+innings=2;
+
+alert("2nd Innings! Target: "+target);
+
+runs=0; wickets=0; balls=0;
+
+let temp=battingTeam;
+battingTeam=bowlingTeam;
+bowlingTeam=temp;
+
+show("batsmen");
+}else{
+showResult();
+}
+}
+
+function nextInnings(){endInnings();}
+
+function checkWin(){
+if(innings===2 && runs>=target){
+showResult(true);
+}
+}
+
+function showResult(win){
+let text=win?
+battingTeam+" won by "+(10-wickets)+" wickets":
+bowlingTeam+" won by "+(target-runs-1)+" runs";
+
+document.getElementById("result").innerText=text;
+show("scorecard");
+}
+
+</script>
+
+</body>
+</html>
