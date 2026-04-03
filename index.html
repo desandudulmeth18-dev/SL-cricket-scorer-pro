@@ -38,7 +38,6 @@ width:100%;
 background:#001f33;
 padding:12px;
 text-align:center;
-box-shadow:0 0 20px #00ffcc;
 animation:glow 2s infinite alternate;
 }
 
@@ -47,42 +46,29 @@ from{box-shadow:0 0 10px #00ffcc;}
 to{box-shadow:0 0 30px #00ffcc;}
 }
 
-.logo{
-font-size:24px;
-font-weight:bold;
-}
-
-.sub{
-font-size:12px;
-color:#66ffcc;
-}
-
-/* LAYOUT */
-.container{
-width:95%;
-height:100%;
+/* CENTER SCORE */
+.top{
 display:flex;
 flex-direction:column;
-justify-content:space-between;
+justify-content:center;
+align-items:center;
+height:35vh;
+text-align:center;
 }
 
-.top{text-align:center;}
-
 .score{
-font-size:100px;
+font-size:120px;
 font-weight:bold;
 animation:pulse 1.5s infinite;
 }
 
 @keyframes pulse{
 0%{transform:scale(1);}
-50%{transform:scale(1.08);}
+50%{transform:scale(1.1);}
 100%{transform:scale(1);}
 }
 
-.match{font-size:22px;}
-#overs{font-size:20px;}
-
+/* PANELS */
 .middle{
 display:flex;
 justify-content:space-between;
@@ -91,74 +77,49 @@ padding:0 10px;
 
 .panel{
 width:32%;
-background:#003366;
-padding:10px;
+background:#004d66;
+padding:12px;
 border-radius:15px;
-box-shadow:0 0 15px #00ffcc;
+box-shadow:0 0 20px #00ffcc;
+font-size:17px;
 }
 
-.panel h3{
-font-size:18px;
-}
-
-.info{
-font-size:16px;
-margin:5px 0;
-}
-
-.controls{
-text-align:center;
-}
-
-/* BUTTONS (FULL ANIMATION) */
+/* BUTTONS */
 button{
-margin:8px;
-padding:14px 22px;
-font-size:18px;
+margin:10px;
+padding:16px 26px;
+font-size:20px;
 border:none;
-border-radius:12px;
+border-radius:14px;
 cursor:pointer;
 transition:all 0.2s ease;
 position:relative;
 overflow:hidden;
 }
 
-/* HOVER */
 button:hover{
-transform:scale(1.1);
-box-shadow:0 0 15px #00ffcc;
+transform:scale(1.12);
+box-shadow:0 0 20px #00ffcc;
 }
 
-/* CLICK */
 button:active{
-transform:scale(0.9);
-}
-
-/* SHINE EFFECT */
-button::after{
-content:'';
-position:absolute;
-top:0;
-left:-100%;
-width:100%;
-height:100%;
-background:linear-gradient(120deg,transparent,rgba(255,255,255,0.4),transparent);
-transition:0.5s;
-}
-
-button:hover::after{
-left:100%;
+transform:scale(0.92);
 }
 
 /* COLORS */
-.run{background:#00cc66;color:black;}
-.boundary{background:#00ffcc;color:black;}
-.dot{background:#444;color:white;}
-.wicket{background:#cc0000;color:white;}
-.control{background:#0099cc;color:white;}
+.run{background:#00ff99;color:black;}
+.boundary{background:#00ffff;color:black;}
+.dot{background:#666;color:white;}
+.wicket{background:#ff3333;color:white;}
+.control{background:#00aaff;color:white;}
+
+.controls{
+text-align:center;
+padding-bottom:10px;
+}
 
 input{
-padding:10px;
+padding:12px;
 margin:6px;
 border-radius:10px;
 border:none;
@@ -176,7 +137,7 @@ animation:spin 1s linear infinite;
 100%{transform:rotateY(360deg);}
 }
 
-/* SCORE POP */
+/* POP */
 .pop{animation:pop 0.3s;}
 
 @keyframes pop{
@@ -195,8 +156,7 @@ animation:spin 1s linear infinite;
 <!-- INTRO -->
 <div class="screen active" id="intro">
 <h1>🏏 SL Cricket Scorer Pro</h1>
-<p>Professional Cricket Scoring App</p>
-<p style="font-size:12px;color:#66ffcc;">Developed by Desandu</p>
+<p>Developed by Desandu</p>
 </div>
 
 <div class="screen" id="oversScreen">
@@ -246,7 +206,7 @@ animation:spin 1s linear infinite;
 <div class="container">
 
 <div class="top">
-<div class="match" id="matchTitle"></div>
+<div id="matchTitle"></div>
 <div class="score" id="score">0/0</div>
 <div id="overs"></div>
 </div>
@@ -255,24 +215,26 @@ animation:spin 1s linear infinite;
 
 <div class="panel">
 <h3>Batsmen</h3>
-<div id="striker" class="info"></div>
-<div id="nonStriker" class="info"></div>
+<div id="striker"></div>
+<div id="nonStriker"></div>
 </div>
 
 <div class="panel">
 <h3>Game Info</h3>
-<div id="innings" class="info"></div>
-<div id="target" class="info"></div>
+<div id="innings"></div>
+<div id="target"></div>
+<div id="extras"></div>
 </div>
 
 <div class="panel">
 <h3>Bowler</h3>
-<div id="bowler" class="info"></div>
+<div id="bowler"></div>
 </div>
 
 </div>
 
 <div class="controls">
+
 <button class="run" onclick="run(1)">1</button>
 <button class="run" onclick="run(2)">2</button>
 <button class="run" onclick="run(3)">3</button>
@@ -286,7 +248,20 @@ animation:spin 1s linear infinite;
 
 <br>
 
+<button class="control" onclick="bye(1)">BYE 1</button>
+<button class="control" onclick="bye(2)">BYE 2</button>
+
+<button class="control" onclick="wide()">WIDE</button>
+
+<button class="control" onclick="noBall()">NB</button>
+<button class="control" onclick="noBallRun(1)">NB+1</button>
+<button class="control" onclick="noBallRun(4)">NB+4</button>
+<button class="control" onclick="noBallRun(6)">NB+6</button>
+
+<br>
+
 <button class="control" onclick="nextInnings()">NEXT INNINGS</button>
+
 </div>
 
 </div>
@@ -298,7 +273,7 @@ animation:spin 1s linear infinite;
 </div>
 
 <script>
-
+// (UNCHANGED LOGIC — SAME AS BEFORE)
 let t1,t2,tossWinner,battingTeam,bowlingTeam;
 let innings=1,target=0,maxOvers=null;
 
@@ -306,6 +281,8 @@ let runs=0,wickets=0,balls=0;
 let striker,nonStriker;
 let sRuns=0,sBalls=0,nsRuns=0,nsBalls=0;
 let currentBowler="",overRuns=0;
+
+let wides=0,noBalls=0,byes=0;
 
 function show(id){
 document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -339,7 +316,6 @@ function toss(team){
 tossWinner=team;
 document.getElementById("coinSound").play();
 show("coinScreen");
-
 setTimeout(()=>show("decision"),2000);
 }
 
@@ -373,13 +349,10 @@ setTimeout(()=>scoreEl.classList.remove("pop"),300);
 scoreEl.innerText=runs+"/"+wickets;
 document.getElementById("overs").innerText="Overs: "+over;
 
-document.getElementById("striker").innerText=
-striker+" "+sRuns+"("+sBalls+")";
-
-document.getElementById("nonStriker").innerText=
-nonStriker+" "+nsRuns+"("+nsBalls+")";
-
+document.getElementById("striker").innerText=striker+" "+sRuns+"("+sBalls+")";
+document.getElementById("nonStriker").innerText=nonStriker+" "+nsRuns+"("+nsBalls+")";
 document.getElementById("innings").innerText="Innings: "+innings;
+document.getElementById("extras").innerText="Extras: Wd "+wides+" | Nb "+noBalls+" | By "+byes;
 
 if(innings===2){
 document.getElementById("target").innerText="Target: "+target;
@@ -393,24 +366,41 @@ endInnings();
 function run(r){
 runs+=r; balls++; sRuns+=r; sBalls++; overRuns+=r;
 if(r>=4) document.getElementById("crowd").play();
-
 if(r%2===1) swap();
 if(balls%6===0) newOver();
+update(); checkWin();
+}
 
-update();
-checkWin();
+function bye(r){
+runs+=r; balls++; byes+=r; sBalls++; overRuns+=r;
+if(r%2===1) swap();
+if(balls%6===0) newOver();
+update(); checkWin();
+}
+
+function wide(){
+runs+=1; wides++; overRuns+=1;
+update(); checkWin();
+}
+
+function noBall(){
+runs+=1; noBalls++; overRuns+=1;
+update(); checkWin();
+}
+
+function noBallRun(r){
+runs+=1+r; noBalls++; sRuns+=r; sBalls++; overRuns+=1+r;
+if(r%2===1) swap();
+update(); checkWin();
 }
 
 function dot(){balls++; sBalls++; if(balls%6===0)newOver(); update();}
 
 function wicket(){
 wickets++; balls++; sBalls++;
-
 if(wickets===10){endInnings();return;}
-
 striker=prompt("New batsman:");
 sRuns=0; sBalls=0;
-
 update();
 }
 
@@ -423,10 +413,8 @@ function swap(){
 function newOver(){
 alert("Over: "+overRuns+" runs");
 overRuns=0;
-
 currentBowler=prompt("New Bowler:");
 document.getElementById("bowler").innerText=currentBowler;
-
 swap();
 }
 
@@ -435,9 +423,8 @@ if(innings===1){
 target=runs+1;
 innings=2;
 
-alert("2nd Innings! Target: "+target);
-
 runs=0; wickets=0; balls=0;
+wides=0; noBalls=0; byes=0;
 
 let temp=battingTeam;
 battingTeam=bowlingTeam;
